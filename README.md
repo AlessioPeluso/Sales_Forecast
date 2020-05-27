@@ -195,3 +195,60 @@ NormaltestResult(statistic=13.091317273020326, pvalue=0.0014363377464834469)
 
 vediamo una correlazione ricorrente sia nel ACF che nel PACF, quindi dobbiamo lavorare con la stagionalità.
 
+- **Consideriamo la stagionalità con un modello SARIMA**
+
+```
+sarima_mod6 = sm.tsa.statespace.SARIMAX(train_df.sales, trend='n', order=(6,1,0)).fit()
+print(sarima_mod6.summary())
+                               SARIMAX Results                                
+==============================================================================
+Dep. Variable:                  sales   No. Observations:                 1000
+Model:               SARIMAX(6, 1, 0)   Log Likelihood               -3016.023
+Date:                Wed, 27 May 2020   AIC                           6046.046
+Time:                        18:43:27   BIC                           6080.393
+Sample:                    01-02-2013   HQIC                          6059.101
+                         - 09-28-2015                                         
+Covariance Type:                  opg                                         
+==============================================================================
+                 coef    std err          z      P>|z|      [0.025      0.975]
+------------------------------------------------------------------------------
+ar.L1         -0.8208      0.028    -29.709      0.000      -0.875      -0.767
+ar.L2         -0.7604      0.032    -23.982      0.000      -0.823      -0.698
+ar.L3         -0.6598      0.033    -19.807      0.000      -0.725      -0.595
+ar.L4         -0.6305      0.035    -17.771      0.000      -0.700      -0.561
+ar.L5         -0.5388      0.034    -15.880      0.000      -0.605      -0.472
+ar.L6         -0.3965      0.027    -14.459      0.000      -0.450      -0.343
+sigma2        24.4864      0.962     25.457      0.000      22.601      26.372
+===================================================================================
+Ljung-Box (Q):                       95.18   Jarque-Bera (JB):                19.76
+Prob(Q):                              0.00   Prob(JB):                         0.00
+Heteroskedasticity (H):               1.39   Skew:                             0.09
+Prob(H) (two-sided):                  0.00   Kurtosis:                         3.66
+===================================================================================
+```
+
+- *** previsioni e valutazione*** \
+uso gli ultimi 30 giorni del training come test
+
+```
+start_index = 1730
+end_index = 1826
+train_df['forecast'] = sarima_mod6.predict(start = start_index, end= end_index, dynamic= True)
+train_df[start_index:end_index][['sales', 'forecast']].plot(figsize=(12, 8))
+```
+
+![](image9.png)
+
+Calcoliamo MAPE e SMAPE:
+```
+def smape_kun(y_true, y_pred):
+    mape = np.mean(abs((y_true-y_pred)/y_true))*100
+    smape = np.mean((np.abs(y_pred - y_true) * 200/ (np.abs(y_pred) + np.abs(y_true))).fillna(0))
+    print('MAPE: %.2f %% \nSMAPE: %.2f'% (mape,smape), "%")
+
+smape_kun(train_df[1730:1825]['sales'],train_df[1730:1825]['forecast'])
+
+MAPE: 22.03 % 
+SMAPE: 19.61 %
+
+```
