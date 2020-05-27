@@ -231,8 +231,8 @@ Prob(H) (two-sided):                  0.00   Kurtosis:                         3
 uso gli ultimi 30 giorni del training come test
 
 ```
-start_index = 1730
-end_index = 1826
+start_index = 950
+end_index = 999
 train_df['forecast'] = sarima_mod6.predict(start = start_index, end= end_index, dynamic= True)
 train_df[start_index:end_index][['sales', 'forecast']].plot(figsize=(12, 8))
 ```
@@ -246,7 +246,7 @@ def smape_kun(y_true, y_pred):
     smape = np.mean((np.abs(y_pred - y_true) * 200/ (np.abs(y_pred) + np.abs(y_true))).fillna(0))
     print('MAPE: %.2f %% \nSMAPE: %.2f'% (mape,smape), "%")
 
-smape_kun(train_df[1730:1825]['sales'],train_df[1730:1825]['forecast'])
+smape_kun(train_df[950:999]['sales'],train_df[950:999]['forecast'])
 
 MAPE: 22.03 % 
 SMAPE: 19.61 %
