@@ -227,7 +227,7 @@ Prob(H) (two-sided):                  0.00   Kurtosis:                         3
 ===================================================================================
 ```
 
-- *** previsioni e valutazione*** \
+- **previsioni e valutazione** \
 uso gli ultimi 30 giorni del training come test
 
 ```
